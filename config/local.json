@@ -4,5 +4,15 @@
     "mongoDb":{
         "url":"mongodb://127.0.0.1:27017/",
         "dbName":"auto-bid"
+    },
+    "freelancer":{
+        "client_id": "b44e0e97-2e22-4ee9-adbc-f5df4ef17e88",
+        "Oauth_URI": "https://accounts.freelancer-sandbox.com/oauth/authorize",
+        "Oauth_token_URL": "https://accounts.freelancer-sandbox.com/oauth/token",
+        "client_secret": "cfadd8b8aee9f28a3b8ce6b400f749f498adb60821c7e5e9c87b20ef78a97573d1db8df497e90dd9f9c22fb2ceadffd826749812392377b9ccacd40d35f6fa31",
+        "client_URI": "http://localhost:3000",
+        "redirect_URI": "http://localhost:3000/register",
+        "prompt" : "select_account consent",
+        "advanced_scopes" :"1 3"
     }
 }

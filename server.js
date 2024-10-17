@@ -7,7 +7,7 @@ const { logger } = require("./logger");
 const connectDB = require("./config/db");
 const routes = require("./routes/index");
 const { errorHandler } = require("./middlewares/error.middlewares");
-const { ApiError } = require("./utils/ApiError");
+
 const app = express();
 
 //connect to MongoDB
@@ -36,7 +36,6 @@ app.use(cors());
 app.use(express.json());
 app.use("/", routes);
 
-logger.info("This is an info message");
 app.use(errorHandler);
 app.listen(config.port, () => {
   console.log(`Server is Listening on port ${config.port}`);
