@@ -7,14 +7,6 @@ const sentAuthorizationGrant = async (code) => {
   const { Oauth_token_URL, client_id, redirect_URI, client_secret } =
     config.freelancer;
 
-  const grantData = {
-    grant_type: "authorization_code",
-    code: code, // Replace with actual authorization code
-    client_id: client_id, // Replace with actual client ID
-    client_secret: client_secret, // Replace with actual client secret
-    redirect_uri: redirect_URI, // Replace with actual redirect URI
-  };
-
   const payload = `grant_type=authorization_code&code=${code}&client_id=${client_id}&client_secret=${client_secret}&redirect_uri=${redirect_URI}`;
 
   try {
@@ -35,9 +27,9 @@ const sentAuthorizationGrant = async (code) => {
     }
 
     const responseData = await response.json();
-    console.log("Success:", responseData);
+
     const userdata = await fetchUserData(responseData);
-    console.log(userdata);
+    console.log(userdata, "successful user fetched");
     return {
       success: true,
       data: {
@@ -58,7 +50,7 @@ const fetchUserData = async (data) => {
   console.log(data, "token recieved");
   try {
     const response = await fetch(
-      `https://www.freelancer-sandbox.com/api/users/0.1/self/`,
+      `https://www.freelancer-sandbox.com/api/users/0.1/self/?avatar=true&profile_description=true`,
       {
         method: "GET",
         headers: {
@@ -75,7 +67,6 @@ const fetchUserData = async (data) => {
     }
 
     const responseData = await response.json();
-    console.log("Success:", responseData);
     return {
       success: true,
       data: responseData, // Return the data from the response

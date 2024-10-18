@@ -6,6 +6,7 @@
         "dbName":"auto-bid"
     },
     "freelancer":{
+        "env_base_URL": "https://www.freelancer.com",
         "client_id": "b44e0e97-2e22-4ee9-adbc-f5df4ef17e88",
         "Oauth_URI": "https://accounts.freelancer-sandbox.com/oauth/authorize",
         "Oauth_token_URL": "https://accounts.freelancer-sandbox.com/oauth/token",

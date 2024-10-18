@@ -2,10 +2,10 @@ const express = require("express");
 const router = express.Router();
 
 //Import routes
-const userRoutes = require("./user");
+const authRoutes = require("./auth");
 const projectRoutes = require("./project");
 
-router.use("/users", userRoutes);
+router.use("/auth", authRoutes);
 router.use("/projects", projectRoutes);
 
 module.exports = router;

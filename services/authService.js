@@ -56,7 +56,7 @@ const addOauthUser = asyncHandler(async (req, res) => {
   const {
     id: freelancerId,
     public_name,
-    avatar,
+    avatar_large_cdn,
     freelancer_verified_status,
     email,
     username,
@@ -69,9 +69,9 @@ const addOauthUser = asyncHandler(async (req, res) => {
     username: username,
     displayName: public_name,
     profileImage:
-      avatar == null
+      avatar_large_cdn == null
         ? "https://wrkbemanning.no/wp-content/uploads/2017/04/profile-pic-dummy.jpg"
-        : avatar,
+        : `https:${avatar_large_cdn}`,
     email: email,
     active: freelancer_verified_status,
     password: hashedPassword,
@@ -94,49 +94,31 @@ const healthCheck = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "ok", "health check passed"));
 });
 
-const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+const loginUser = asyncHandler(async (req, res) => {
+  const { username, password } = req.body;
 
-  try {
-    // Find the user by email
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
-    }
-
-    // Compare the hashed password with the provided password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({
-        message: "Invalid credentials",
-      });
-    }
-
-    // Return a successful response (you may want to include a token here)
-    res.status(200).json({
-      code: 200,
-      message: "Login successful",
-      data: {
-        username: user.username,
-        profileImage: user.profileImage,
-        email: user.email,
-      },
-    });
-  } catch (error) {
-    console.error(error);
-    // Return an error response
-    res.status(500).json({
-      code: 500,
-      message: "Error logging in",
-      error: error.message,
-    });
+  // Find the user by email
+  const user = await User.findOne({ username });
+  if (!user) {
+    throw new ApiError(400, "user not found");
   }
-};
+
+  // Compare the hashed password with the provided password
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    throw new ApiError(500, "Invalid credentials");
+  }
+
+  //destructure the user object
+  const { password: _, tokenData, ...userData } = user.toObject();
+
+  // Return a successful response (you may want to include a token here)
+  res
+    .status(200)
+    .json(new ApiResponse(200, userData, "user logged in successfully"));
+});
 
 const redirect = asyncHandler(async (req, res) => {
-  console.log(config);
   const { Oauth_URI, client_id, redirect_URI, prompt } = config.freelancer;
   const url = `${Oauth_URI}?response_type=code&client_id=${client_id}&redirect_uri=${redirect_URI}&scope=basic&prompt=${prompt}`;
   return res.status(201).json(new ApiResponse(201, url, "url sent"));
