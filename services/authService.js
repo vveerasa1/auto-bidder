@@ -7,6 +7,7 @@ const { ApiResponse } = require("../utils/ApiResponse");
 const { ApiError } = require("../utils/ApiError");
 const { asyncHandler } = require("../utils/asyncHandler");
 const { sentAuthorizationGrant } = require("../utils/freelancerApi/auth");
+const Skills = require("../models/Skills");
 
 const addUser = asyncHandler(async (req, res, next) => {
   const { username, profileImage, email, password } = req.body;
@@ -60,6 +61,7 @@ const addOauthUser = asyncHandler(async (req, res) => {
     freelancer_verified_status,
     email,
     username,
+    jobs,
   } = response?.data?.userdata?.data?.result;
 
   const password = `${username}@${String(freelancerId).slice(-4)}`;
@@ -80,6 +82,20 @@ const addOauthUser = asyncHandler(async (req, res) => {
 
   try {
     const savedUser = await newUser.save();
+
+    //after successful registration
+    const userSkills = jobs.map((skill) => ({
+      id: skill.id,
+      name: skill.name,
+    }));
+
+    const newSkills = new Skills({
+      userId: savedUser._id,
+      skills: userSkills,
+    });
+
+    const saveSkills = await newSkills.save();
+    console.log("skills added successfully");
     return res
       .status(201)
       .json(new ApiResponse(200, savedUser, "User created successfully"));

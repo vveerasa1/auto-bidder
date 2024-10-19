@@ -8,11 +8,13 @@ const GET_PROJECT_URL = `${config.freelancer.env_base_URL}/api/projects/0.1/proj
 /**
  * https://www.freelancer.com/api/projects/0.1/projects/active/?compact=&limit=3&project_types%5B%5D=fixed&max_avg_price=500%3D&min_avg_price=250&query=django
  */
-const getAllActiveProjects = async (limit, offset, token) => {
+const getAllActiveProjects = async (limit, offset, token, skillsResult) => {
   try {
     console.log(`${GET_PROJECT_URL}?limit=${limit}&offset=${offset}`, "my url");
     const response = await fetch(
-      `https://www.freelancer.com/api/projects/0.1/projects/active/?limit=${limit}&offset=${offset}&full_description=true&job_details=true&user_details=true&user_display_info=true`,
+      `https://www.freelancer.com/api/projects/0.1/projects/active/?limit=${limit}&offset=${offset}&full_description=true&job_details=true&user_details=true&user_display_info=true${
+        skillsResult.length > 0 ? "&" + skillsResult : ""
+      }`,
       {
         method: "GET",
         headers: { "freelancer-oauth-v1": token },

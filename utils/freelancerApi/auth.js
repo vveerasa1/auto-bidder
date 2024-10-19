@@ -50,7 +50,7 @@ const fetchUserData = async (data) => {
   console.log(data, "token recieved");
   try {
     const response = await fetch(
-      `https://www.freelancer-sandbox.com/api/users/0.1/self/?avatar=true&profile_description=true`,
+      `https://www.freelancer-sandbox.com/api/users/0.1/self/?avatar=true&profile_description=true&portfolio_details=true&jobs=true`,
       {
         method: "GET",
         headers: {

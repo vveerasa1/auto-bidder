@@ -3,6 +3,7 @@ const { ApiResponse } = require("../utils/ApiResponse");
 const { asyncHandler } = require("../utils/asyncHandler");
 const User = require("../models/User");
 const { getAllActiveProjects } = require("../utils/freelancerApi/projects");
+const { convertUserSkillToString } = require("../utils/utils");
 
 const getAllProjects = asyncHandler(async (req, res) => {
   const { freelancerId } = req.params;
@@ -31,7 +32,47 @@ const getAllProjects = asyncHandler(async (req, res) => {
   //user access token
   const { access_token } = token[0]?.tokenData;
 
-  const activeProjects = await getAllActiveProjects(limit, skip, access_token);
+  //need to return the skills array
+  const userSkills = await User.aggregate([
+    {
+      $match: {
+        freelancerId: Number(freelancerId), // Match the user with the specified freelancerId
+      },
+    },
+    {
+      $lookup: {
+        from: "skills", // The name of the skills collection
+        localField: "_id", // Field from the input documents (Users) to match
+        foreignField: "userId", // Field from the skills documents to match
+        as: "skills", // Name of the new array field to add
+      },
+    },
+    {
+      $unwind: {
+        path: "$skills",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $group: {
+        _id: "$_id", // Group by user ID
+        skills: { $first: "$skills" }, // Get the first skill
+      },
+    },
+    {
+      $project: {
+        skills: 1,
+      },
+    },
+  ]);
+  const skillsResult = convertUserSkillToString(userSkills[0]);
+
+  const activeProjects = await getAllActiveProjects(
+    limit,
+    skip,
+    access_token,
+    skillsResult
+  );
 
   if (!activeProjects.success) {
     throw new ApiError(500, "unable to get active projects");
