@@ -21,8 +21,7 @@ const AiTemplatesSchema = new mongoose.Schema({
      },
      portfolioLinks : {
         type:String
-     }
-
-})
+     },
+   }, {timestamps: true});
 
 module.exports = mongoose.model("AITemplates", AiTemplatesSchema);

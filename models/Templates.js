@@ -16,7 +16,6 @@ const templatesSchema = new mongoose.Schema({
      skills : {
         type: [String]
      }
-
-})
+   }, {timestamps: true});
 
 module.exports = mongoose.model("Templates", templatesSchema);

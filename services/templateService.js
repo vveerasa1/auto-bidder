@@ -9,7 +9,7 @@ const addTemplate = asyncHandler(async (req, res) => {
     const { userId, category, content, skills } = req.body;
 
     // Validate that all required fields are present
-    if (!userId || !category || !content || !skills || !Array.isArray(skills)) {
+    if (!userId || !category || !content ) {
         message = "User ID, category, content, and skills are all required." 
         throw new ApiError(400,message);
     }
@@ -36,7 +36,7 @@ const addTemplate = asyncHandler(async (req, res) => {
 });
 
 const getAllTemplates = asyncHandler(async (req, res) => {
-    const { userId } = req.body;
+    const { userId } = req.query;
 
     // Validate that userId is provided
     if (!userId) {
@@ -66,10 +66,10 @@ const getAllTemplates = asyncHandler(async (req, res) => {
 
 const updateTemplate = asyncHandler(async (req, res) => {
     const { templateId } = req.params;
-    const { userId, category, content, skills } = req.body;
+    const { userId, category, content } = req.body;
 
     // Validate that templateId and all required fields are present
-    if (!templateId || !userId || !category || !content || !skills || !Array.isArray(skills)) {
+    if (!templateId || !userId || !category || !content) {
         throw new ApiError(400, "Template ID, User ID, category, content, and skills are all required.");
     }
 
@@ -168,7 +168,7 @@ const addAITemplate = asyncHandler(async (req, res) => {
     const { userId, wordsCount, content, skills, portfolioLinks } = req.body;
 
     // Validate that all required fields are present
-    if (!userId || !content || !skills || !Array.isArray(skills) || !wordsCount || portfolioLinks) {
+    if (!userId || !content || !wordsCount) {
         message = "User ID, category, content, skills, wordsCount, portfolioLinks are all required." 
         throw new ApiError(400,message);
     }
@@ -258,7 +258,7 @@ const updateAITemplate = asyncHandler(async (req, res) => {
     const { userId, wordsCount, content, skills, portfolioLinks } = req.body;
 
     // Validate that templateId and all required fields are present
-     if (!userId || !content || !skills || !Array.isArray(skills) || !wordsCount || !portfolioLinks) {
+     if (!userId || !content || !wordsCount) {
         message = "User ID, wordscount, content, skills, wordsCount, portfolioLinks are all required." 
         throw new ApiError(400,message);
     }

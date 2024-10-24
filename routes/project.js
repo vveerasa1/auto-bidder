@@ -8,6 +8,6 @@ const router = express.Router();
 router.get("/:freelancerId", getAllProjects);
 
 //POST - projects/placebids place bid for the project
-router.post("/placebids", placeBid);
+router.post("/bids", placeBid);
 
 module.exports = router;

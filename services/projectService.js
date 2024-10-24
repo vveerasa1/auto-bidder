@@ -4,7 +4,7 @@ const { asyncHandler } = require("../utils/asyncHandler");
 
 const User = require("../models/User");
 const Skills = require("../models/Skills");
-
+const AITemplate = require("../models/AiTemplates")
 const {
   getAllActiveProjects,
   findRequiredSkills,
@@ -161,9 +161,9 @@ const placeBid = asyncHandler(async (req, res) => {
     requiredSkills.data
   );
 
-  // if (missingSkills.missingSkills.length > 0) {
-  //   throw new ApiError(500, missingSkills.missingSkills);
-  // }
+  if (missingSkills.missingSkills.length > 0) {
+    throw new ApiError(500, missingSkills.missingSkills);
+  }
 
   // add the missing skills to the job
   // const isJobAdded = await addRequiredSkills(missingSkills, access_token);
