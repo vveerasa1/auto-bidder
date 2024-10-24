@@ -13,41 +13,18 @@ const addTemplate = asyncHandler(async (req, res) => {
     message = "User ID, category, content, and skills are all required.";
     throw new ApiError(400, message);
   }
-  // Validate that all required fields are present
-  if (!userId || !category || !content) {
-    message = "User ID, category, content, and skills are all required.";
-    throw new ApiError(400, message);
-  }
-
   try {
     // Create a new template
     const template = new Templates({
       userId,
       category,
       content,
-      skills,
+      skills: skills || [],
     });
-    try {
-      // Create a new template
-      const template = new Templates({
-        userId,
-        category,
-        content,
-        skills: skills || [],
-      });
 
-      // Save the template to the database
-      const savedTemplate = await template.save();
+    // Save the template to the database
+    const savedTemplate = await template.save();
 
-      return res
-        .status(200)
-        .json(
-          new ApiResponse(200, savedTemplate, "Template created successfully")
-        );
-    } catch (error) {
-      // Handle errors
-      throw new ApiError(500, "Failed to create template", error.message);
-    }
     return res
       .status(200)
       .json(
@@ -64,10 +41,6 @@ const getAllTemplates = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1; // Default to page 1
   const limit = parseInt(req.query.limit) || 10; // Default to 10 templates per page
 
-  // Validate that userId is provided
-  if (!userId) {
-    throw new ApiError(400, "User ID is required.");
-  }
   // Validate that userId is provided
   if (!userId) {
     throw new ApiError(400, "User ID is required.");
@@ -144,13 +117,6 @@ const updateTemplate = asyncHandler(async (req, res) => {
   const { templateId } = req.params;
   const { userId, category, content, skills } = req.body;
 
-  // Validate that templateId and all required fields are present
-  if (!templateId || !userId || !category || !content) {
-    throw new ApiError(
-      400,
-      "Template ID, User ID, category, content, and skills are all required."
-    );
-  }
   // Validate that templateId and all required fields are present
   if (!templateId || !userId || !category || !content) {
     throw new ApiError(
