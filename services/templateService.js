@@ -41,6 +41,8 @@ const addTemplate = asyncHandler(async (req, res) => {
 
 const getAllTemplates = asyncHandler(async (req, res) => {
   const { userId } = req.query;
+  const page = parseInt(req.query.page) || 1; // Default to page 1
+  const limit = parseInt(req.query.limit) || 10; // Default to 10 templates per page
 
   // Validate that userId is provided
   if (!userId) {
@@ -48,23 +50,17 @@ const getAllTemplates = asyncHandler(async (req, res) => {
   }
 
   try {
-    // Find all templates by userId
-    const templates = await Templates.aggregate([
-      {
-        $match: { userId: new mongoose.Types.ObjectId(userId) }, // Filter templates by userId
-      },
-      {
-        $group: {
-          _id: "$category", // Group by the 'category' field
-          templates: { $push: "$$ROOT" }, // Optional: collect all templates in that category
-        },
-      },
-    ]);
-    // const templates = await Templates.find({ userId });
+    // Calculate the number of documents to skip
+    const skip = (page - 1) * limit;
 
-    //Find the user skill length
-    const skillLength = await Skills.find({ userId });
-    console.log(skillLength[0].skills.length);
+    // Find all templates by userId, sorted by createdAt in descending order
+    const templates = await Templates.find({ userId })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    // Get the total count of templates for the userId
+    const totalTemplates = await Templates.countDocuments({ userId });
 
     // Check if templates are found
     if (!templates || templates.length === 0) {
@@ -79,13 +75,49 @@ const getAllTemplates = asyncHandler(async (req, res) => {
       skillLength: skillLength[0].skills.length,
     };
 
-    // Send a success response with the found templates
-    return res
-      .status(200)
-      .json(new ApiResponse(200, result, "Templates retrieved successfully."));
+    // Group templates by category
+    const groupedTemplates = templates.reduce((acc, template) => {
+      const category = template.category;
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push(template);
+      return acc;
+    }, {});
+
+    // Define the desired category order
+    const categoryOrder = [
+      "Greeting",
+      "Introduction",
+      "Skills",
+      "Closing Line",
+      "Signature",
+    ];
+
+    // Sort categories according to the defined order and filter out categories that are not in the list
+    const sortedTemplates = categoryOrder
+      .filter((category) => groupedTemplates[category]) // Only include categories that exist
+      .map((category) => ({
+        category,
+        templates: groupedTemplates[category],
+      }));
+
+    // Send a success response with the grouped and sorted templates, including pagination info
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        {
+          templates: sortedTemplates,
+          currentPage: page,
+          totalPages: Math.ceil(totalTemplates / limit),
+          totalTemplates,
+        },
+        "Templates retrieved successfully."
+      )
+    );
   } catch (error) {
     // Handle errors
-    throw new ApiError(500, "Failed to retrieve templates.", error.message);
+    throw new ApiError(500, "Failed to retrieve templates.");
   }
 });
 
